@@ -4,8 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -20,4 +23,11 @@ public class User {
     private String lastName;
     @Column(name = "email_address", nullable = false)
     private String emailId;
+    @UpdateTimestamp
+    @Column(name = "timestamp", nullable = false)
+    private @Setter(AccessLevel.PROTECTED)
+    LocalDateTime timeStamp;
+    @CreationTimestamp
+    @Column(name = "created", nullable = false)
+    private @Setter(AccessLevel.PROTECTED) LocalDateTime created;
 }

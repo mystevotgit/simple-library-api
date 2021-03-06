@@ -7,5 +7,9 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SearchDTO {
+public class BorrowDTO {
+    private long id;
+    private long userId;
+    private long bookId;
+    private int copies;
 }

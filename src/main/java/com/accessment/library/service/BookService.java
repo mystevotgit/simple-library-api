@@ -26,5 +26,5 @@ public interface BookService {
 
     Set<BookDTO> bookSearch(@Valid SearchDTO keywords);
 
-    LendResponseDTO lendBook(Long bookId, Long userId);
+    LendResponseDTO lendBook(@Valid BookDTO bookDetails, Long userId);
 }

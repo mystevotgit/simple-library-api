@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -52,8 +51,8 @@ public class LibraryController {
         return bookService.bookSearch(searchDetails);
     }
 
-    @PostMapping("/book/lendbook/{bookId}/{userId}")
-    public LendResponseDTO lendBook(@PathVariable(value = "bookId") Long bookId, @PathVariable(value = "userId") Long userId) {
-        return bookService.lendBook(bookId, userId);
+    @PostMapping("/book/lendbook/{userId}")
+    public LendResponseDTO lendBook(@PathVariable(value = "userId") Long userId, @Valid @RequestBody BookDTO bookDetails) {
+        return bookService.lendBook(bookDetails, userId);
     }
 }

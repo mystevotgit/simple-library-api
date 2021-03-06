@@ -1,5 +1,6 @@
 package com.accessment.library.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,8 +10,10 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
+@Table(name = "users")
 @Getter @Setter
 @NoArgsConstructor
 public class User {
@@ -30,4 +33,8 @@ public class User {
     @CreationTimestamp
     @Column(name = "created", nullable = false)
     private @Setter(AccessLevel.PROTECTED) LocalDateTime created;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<Borrow> booksBorrowed;
 }

@@ -6,11 +6,11 @@ import com.accessment.library.dto.SearchDTO;
 import com.accessment.library.exception.ResourceNotFoundException;
 import com.accessment.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Map;
 import java.util.Set;
 
 @RestController
@@ -20,7 +20,7 @@ public class LibraryController {
     BookService bookService;
 
     @GetMapping("/book")
-    public Set<BookDTO> getAllLibraryBooks() {
+    public ResponseEntity<Set<BookDTO>> getAllLibraryBooks() {
         return bookService.getAllLibraryBooks();
     }
 
@@ -30,7 +30,7 @@ public class LibraryController {
     }
 
     @PostMapping("/book")
-    public BookDTO createBook(@Valid @RequestBody BookDTO bookDetails) {
+    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookDTO bookDetails) {
         return bookService.createBook(bookDetails);
     }
 
@@ -41,18 +41,19 @@ public class LibraryController {
     }
 
     @DeleteMapping("/book/{id}")
-    public Map<String, Boolean> deleteBookById(@PathVariable(value = "id") Long bookId)
+    public <T> ResponseEntity<T> deleteBookById(@PathVariable(value = "id") Long bookId)
             throws ResourceNotFoundException {
-        return bookService.deleteBook(bookId);
+        bookService.deleteBook(bookId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PostMapping("/book/search")
-    public Set<BookDTO> bookSearch(@Valid @RequestBody SearchDTO searchDetails) {
+    public ResponseEntity<Set<BookDTO>> bookSearch(@Valid @RequestBody SearchDTO searchDetails) {
         return bookService.bookSearch(searchDetails);
     }
 
     @PostMapping("/book/lendbook/{userId}")
-    public LendResponseDTO lendBook(@PathVariable(value = "userId") Long userId, @Valid @RequestBody BookDTO bookDetails) {
+    public ResponseEntity<LendResponseDTO> lendBook(@PathVariable(value = "userId") Long userId, @Valid @RequestBody BookDTO bookDetails) {
         return bookService.lendBook(bookDetails, userId);
     }
 }

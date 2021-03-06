@@ -17,9 +17,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,10 +40,11 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public Set<BookDTO> getAllLibraryBooks() {
+    public ResponseEntity<Set<BookDTO>> getAllLibraryBooks() {
         setModelMappingStrategy();
-        return bookRepository.findAll().stream().map(book -> modelMapper.map(book, BookDTO.class))
+        Set<BookDTO> books =  bookRepository.findAll().stream().map(book -> modelMapper.map(book, BookDTO.class))
                 .collect(Collectors.toSet());
+        return ResponseEntity.ok(books);
     }
 
     @Override
@@ -60,7 +58,7 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public BookDTO createBook(@Valid BookDTO bookDetails) {
+    public ResponseEntity<BookDTO> createBook(@Valid BookDTO bookDetails) {
         setModelMappingStrategy();
         Book book = new Book();
         book.setAuthor(bookDetails.getAuthor());
@@ -69,7 +67,7 @@ public class BookServiceImpl implements BookService{
         book.setCopies(bookDetails.getCopies());
         Book savedBook = bookRepository.save(book);
         BookDTO bookDTO = modelMapper.map(savedBook, BookDTO.class);
-        return bookDTO;
+        return ResponseEntity.ok(bookDTO);
     }
 
     @Override
@@ -87,22 +85,20 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public Map<String, Boolean> deleteBook(Long bookId) throws ResourceNotFoundException {
+    public void deleteBook(Long bookId) throws ResourceNotFoundException {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("book not found for this id :: " + bookId));
         bookRepository.delete(book);
-        Map<String, Boolean> response = new HashMap<>();
-        response.put("deleted", Boolean.TRUE);
-        return response;
+        return;
     }
 
     @Override
-    public Set<BookDTO> bookSearch(@Valid SearchDTO keywords) {
+    public ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO keywords) {
         return null;
     }
 
     @Override
-    public LendResponseDTO lendBook(@Valid BookDTO bookDetails, Long userId) {
+    public ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long userId) {
         setModelMappingStrategy();
         Book book = modelMapper.map(bookDetails, Book.class);
         Borrow borrower = new Borrow();
@@ -120,6 +116,6 @@ public class BookServiceImpl implements BookService{
                     .map(borrow, BorrowDTO.class)).collect(Collectors.toSet());
             lendResponseDTO.setBooksBorrowed(booksBorrowed);
         }
-        return lendResponseDTO;
+        return ResponseEntity.ok(lendResponseDTO);
     }
 }

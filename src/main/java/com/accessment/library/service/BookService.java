@@ -16,7 +16,7 @@ public interface BookService {
     ResponseEntity<BookDTO> getBookById(Long bookId)
             throws ResourceNotFoundException;
 
-    ResponseEntity<BookDTO> createBook(@Valid BookDTO bookDetails);
+    void createBook(@Valid BookDTO bookDetails);
 
     ResponseEntity<BookDTO> updateBook(Long bookId, BookDTO bookDetails)
             throws ResourceNotFoundException;
@@ -24,7 +24,7 @@ public interface BookService {
     void deleteBook(Long bookId)
             throws ResourceNotFoundException;
 
-    ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO keywords);
+    ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO searchDetails);
 
     ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long userId);
 

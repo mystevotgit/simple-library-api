@@ -10,23 +10,26 @@ import com.accessment.library.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class BookServiceImpl implements BookService{
     @Autowired
-    BookRepository bookRepository;
+    private BookRepository bookRepository;
 
     @Autowired
-    LendRepository lendRepository;
+    private LendRepository lendRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -49,22 +52,19 @@ public class BookServiceImpl implements BookService{
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found for this id :: " + bookId));
         setModelMappingStrategy();
-        BookDTO bookDTO = modelMapper
-                .map(book, BookDTO.class);
+        BookDTO bookDTO = modelMapper.map(book, BookDTO.class);
         return ResponseEntity.ok().body(bookDTO);
     }
 
     @Override
-    public ResponseEntity<BookDTO> createBook(@Valid BookDTO bookDetails) {
-        setModelMappingStrategy();
+    public void createBook(@Valid BookDTO bookDetails) {
         Book book = new Book();
         book.setAuthor(bookDetails.getAuthor());
         book.setTitle(bookDetails.getTitle());
         book.setCategory(bookDetails.getCategory());
         book.setCopies(bookDetails.getCopies());
-        Book savedBook = bookRepository.save(book);
-        BookDTO bookDTO = modelMapper.map(savedBook, BookDTO.class);
-        return ResponseEntity.ok(bookDTO);
+        bookRepository.save(book);
+        return;
     }
 
     @Override
@@ -90,8 +90,17 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO keywords) {
-        return null;
+    public ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO searchDetails) {
+        Set<String> keywords = new HashSet<>(Arrays.asList(searchDetails.getKeywords().replaceAll(",", "").split(" ")));
+        setModelMappingStrategy();
+        Set<BookDTO> books =  bookRepository.findAll().stream().map(book -> modelMapper.map(book, BookDTO.class))
+                .collect(Collectors.toSet());
+        Set<BookDTO> searchResult = new HashSet<>();
+        keywords.forEach(keyword -> {
+            searchResult.addAll(books.stream().filter(bookDTO -> bookDTO.toString().toLowerCase().contains(keyword.toLowerCase()))
+                    .collect(Collectors.toSet()));
+        });
+        return ResponseEntity.ok(searchResult);
     }
 
     @Override

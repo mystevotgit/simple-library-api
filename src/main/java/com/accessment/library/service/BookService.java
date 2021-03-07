@@ -3,6 +3,7 @@ package com.accessment.library.service;
 import com.accessment.library.dto.BookDTO;
 import com.accessment.library.dto.LendResponseDTO;
 import com.accessment.library.dto.SearchDTO;
+import com.accessment.library.dto.UserDTO;
 import com.accessment.library.exception.ResourceNotFoundException;
 import org.springframework.http.ResponseEntity;
 
@@ -26,4 +27,6 @@ public interface BookService {
     ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO keywords);
 
     ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long userId);
+
+    ResponseEntity<Set<UserDTO>> getBookBorrowersById(Long bookId) throws ResourceNotFoundException;
 }

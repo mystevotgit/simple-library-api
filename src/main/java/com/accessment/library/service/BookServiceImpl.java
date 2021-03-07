@@ -1,9 +1,6 @@
 package com.accessment.library.service;
 
-import com.accessment.library.dto.BookDTO;
-import com.accessment.library.dto.BorrowDTO;
-import com.accessment.library.dto.LendResponseDTO;
-import com.accessment.library.dto.SearchDTO;
+import com.accessment.library.dto.*;
 import com.accessment.library.exception.ResourceNotFoundException;
 import com.accessment.library.model.Book;
 import com.accessment.library.model.Borrow;
@@ -117,5 +114,14 @@ public class BookServiceImpl implements BookService{
             lendResponseDTO.setBooksBorrowed(booksBorrowed);
         }
         return ResponseEntity.ok(lendResponseDTO);
+    }
+
+    @Override
+    public ResponseEntity<Set<UserDTO>> getBookBorrowersById(Long bookId) throws ResourceNotFoundException {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new ResourceNotFoundException("book not found for this id :: " + bookId));
+        setModelMappingStrategy();
+        Set<UserDTO> borrowers = book.getBorrowers().stream().map(borrow -> modelMapper.map(borrow, UserDTO.class)).collect(Collectors.toSet());
+        return ResponseEntity.ok(borrowers);
     }
 }

@@ -3,6 +3,7 @@ package com.accessment.library.controller;
 import com.accessment.library.dto.BookDTO;
 import com.accessment.library.dto.LendResponseDTO;
 import com.accessment.library.dto.SearchDTO;
+import com.accessment.library.dto.UserDTO;
 import com.accessment.library.exception.ResourceNotFoundException;
 import com.accessment.library.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,11 @@ public class LibraryController {
     @GetMapping("/book/{id}")
     public ResponseEntity<BookDTO> getBookById(@PathVariable(value = "id") Long bookId) throws ResourceNotFoundException {
         return bookService.getBookById(bookId);
+    }
+
+    @GetMapping("/book/{id}/borrowers")
+    public ResponseEntity<Set<UserDTO>> getBookBorrowersByBookId(@PathVariable(value = "id") Long bookId) {
+        return bookService.getBookBorrowersById(bookId);
     }
 
     @PostMapping("/book")

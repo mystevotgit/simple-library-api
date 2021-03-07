@@ -13,5 +13,4 @@ public class BookDTO {
     private String author;
     private String category;
     private int copies;
-    private Set<BorrowDTO> borrowers;
 }

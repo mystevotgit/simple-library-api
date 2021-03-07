@@ -18,7 +18,7 @@ import java.util.Set;
 @RequestMapping("/api/v1")
 public class LibraryController {
     @Autowired
-    BookService bookService;
+    private BookService bookService;
 
     @GetMapping("/book")
     public ResponseEntity<Set<BookDTO>> getAllLibraryBooks() {
@@ -31,13 +31,14 @@ public class LibraryController {
     }
 
     @GetMapping("/book/{id}/borrowers")
-    public ResponseEntity<Set<UserDTO>> getBookBorrowersByBookId(@PathVariable(value = "id") Long bookId) {
+    public ResponseEntity<Set<UserDTO>> getBookBorrowersByBookId(@PathVariable(value = "id") Long bookId) throws ResourceNotFoundException {
         return bookService.getBookBorrowersById(bookId);
     }
 
     @PostMapping("/book")
-    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookDTO bookDetails) {
-        return bookService.createBook(bookDetails);
+    public <T>ResponseEntity<T> createBook(@Valid @RequestBody BookDTO bookDetails) {
+        bookService.createBook(bookDetails);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/book/{id}")

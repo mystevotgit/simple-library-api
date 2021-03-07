@@ -44,7 +44,7 @@ public class LibraryController {
     public <T> ResponseEntity<T> deleteBookById(@PathVariable(value = "id") Long bookId)
             throws ResourceNotFoundException {
         bookService.deleteBook(bookId);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PostMapping("/book/search")

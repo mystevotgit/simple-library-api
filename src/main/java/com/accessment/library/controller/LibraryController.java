@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -22,28 +23,31 @@ public class LibraryController {
 
     @GetMapping("/book")
     public ResponseEntity<Set<BookDTO>> getAllLibraryBooks() {
-        return bookService.getAllLibraryBooks();
+        return ResponseEntity.ok(bookService.getAllLibraryBooks());
     }
 
     @GetMapping("/book/{id}")
-    public ResponseEntity<BookDTO> getBookById(@PathVariable(value = "id") Long bookId) throws ResourceNotFoundException {
-        return bookService.getBookById(bookId);
+    public ResponseEntity<List<BookDTO>> getBookById(
+            @PathVariable(value = "id") Long bookId
+    ) throws ResourceNotFoundException {
+        return ResponseEntity.ok(bookService.getBookById(bookId));
     }
 
     @GetMapping("/book/{id}/borrowers")
-    public ResponseEntity<Set<UserDTO>> getBookBorrowersByBookId(@PathVariable(value = "id") Long bookId) throws ResourceNotFoundException {
+    public ResponseEntity<Set<UserDTO>> getBookBorrowersByBookId(
+            @PathVariable(value = "id") Long bookId
+    ) throws ResourceNotFoundException {
         return bookService.getBookBorrowersById(bookId);
     }
 
     @PostMapping("/book")
-    public <T>ResponseEntity<T> createBook(@Valid @RequestBody BookDTO bookDetails) {
-        bookService.createBook(bookDetails);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookDTO bookDetails) {
+        return ResponseEntity.ok(bookService.createBook(bookDetails));
     }
 
     @PutMapping("/book/{id}")
     public ResponseEntity<BookDTO> updateBookById(@PathVariable(value = "id") Long bookId,
-                                                      @Valid @RequestBody BookDTO bookDetails) throws ResourceNotFoundException {
+                                                  @Valid @RequestBody BookDTO bookDetails) throws ResourceNotFoundException {
         return bookService.updateBook(bookId, bookDetails);
     }
 
@@ -59,8 +63,8 @@ public class LibraryController {
         return bookService.bookSearch(searchDetails);
     }
 
-    @PostMapping("/book/lendbook/{userId}")
-    public ResponseEntity<LendResponseDTO> lendBook(@PathVariable(value = "userId") Long userId, @Valid @RequestBody BookDTO bookDetails) {
-        return bookService.lendBook(bookDetails, userId);
+    @PostMapping("/book/lendbook/{bookId}/{userId}")
+    public ResponseEntity<LendResponseDTO> lendBook(@PathVariable(value = "bookId") Long bookId, @PathVariable(value = "userId") Long userId, @Valid @RequestBody BookDTO bookDetails) {
+        return bookService.lendBook(bookDetails, bookId, userId);
     }
 }

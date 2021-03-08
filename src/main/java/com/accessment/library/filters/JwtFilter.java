@@ -33,11 +33,6 @@ public class JwtFilter extends OncePerRequestFilter {
         final String authorizationHeader = req.getHeader("Authorization");
         String uri = req.getRequestURL().toString();
 
-//        if (uri.contains("/swagger") || uri.contains("/auth")) {
-//            req.getRequestDispatcher(req.getServletPath()).forward(req, res);
-//            log.info("forwarding response");
-//        }
-
         String username = null;
         String jwt = null;
         log.info(uri);

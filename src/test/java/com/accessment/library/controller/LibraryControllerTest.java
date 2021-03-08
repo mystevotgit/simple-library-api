@@ -1,5 +1,6 @@
 package com.accessment.library.controller;
 
+import com.accessment.library.dto.BookDTO;
 import com.accessment.library.model.Book;
 import com.accessment.library.model.Borrow;
 import com.accessment.library.model.User;
@@ -22,10 +23,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static com.accessment.library.util.JsonString.asJsonString;
 
 import java.util.*;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -82,6 +84,31 @@ public class LibraryControllerTest {
         getAndVerifyBorrowedBooks(status().isOk(), book.getId(), token);
     }
 
+    @Test
+    @DisplayName("create a book successfully ")
+    public void createBook() throws Exception {
+        final BookDTO bookDTO = new BookDTO();
+        bookDTO.setAuthor("author");
+        bookDTO.setCategory("category");
+        bookDTO.setCopies(4);
+        bookDTO.setTitle("title");
+
+        bookRepository.deleteAll();
+
+        createAndVerifyBooks(status().isOk(), bookDTO, token);
+    }
+
+    @Test
+    public void updateBook() throws Exception {
+        final BookDTO bookDTO = new BookDTO();
+        bookDTO.setAuthor("author updated");
+        bookDTO.setCategory("category updated");
+        bookDTO.setCopies(4);
+        bookDTO.setTitle("titleupdated");
+
+        updateAndVerifyBook(status().isOk(), bookDTO, token);
+    }
+
     public void getAndVerifyBookById(
             final ResultMatcher expectedStatus, final Long bookId
             , final String token
@@ -112,6 +139,30 @@ public class LibraryControllerTest {
                 .header("Authorization", "Bearer " + token))
                 .andExpect(expectedStatus).andDo(print());
 
+    }
+
+    public void createAndVerifyBooks(
+            final ResultMatcher expectedStatus, final BookDTO bookDTO,
+            final String token
+            ) throws Exception {
+
+        mockMvc.perform(post("/api/v1/book")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(asJsonString(bookDTO))
+                .header("Authorization", "Bearer " + token))
+                .andExpect(expectedStatus);
+    }
+
+    public void updateAndVerifyBook(
+            final ResultMatcher expectedStatus,
+            final BookDTO bookDTO, String token
+    ) throws Exception {
+
+        mockMvc.perform(put("/api/v1/book/"+ book.getId())
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(asJsonString(bookDTO))
+                .header("Authorization", "Bearer " + token))
+                .andExpect(expectedStatus);
     }
 
     private UserDetails createUser() {

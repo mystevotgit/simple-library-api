@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private @Id
     @Setter(AccessLevel.PROTECTED) long id;
     @Column(name = "title", unique = true, nullable = false)

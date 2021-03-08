@@ -47,7 +47,8 @@ public class LibraryController {
 
     @PutMapping("/book/{id}")
     public ResponseEntity<BookDTO> updateBookById(@PathVariable(value = "id") Long bookId,
-                                                  @Valid @RequestBody BookDTO bookDetails) throws ResourceNotFoundException {
+                                                  @Valid @RequestBody BookDTO bookDetails
+    ) throws ResourceNotFoundException {
         return bookService.updateBook(bookId, bookDetails);
     }
 

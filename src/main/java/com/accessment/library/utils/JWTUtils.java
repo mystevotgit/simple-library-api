@@ -3,6 +3,7 @@ package com.accessment.library.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +23,7 @@ public class JWTUtils {
 
     public JWTUtils(@Autowired JWTDatasource jwtDataSource) {
         this.jwtDataSource = jwtDataSource;
-        this.SECRET_KEY = jwtDataSource.getSecretKey();
+        this.SECRET_KEY = "mysecretkey";
     }
 
     public String extractUsername(String token) {
@@ -52,10 +53,11 @@ public class JWTUtils {
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
-        return Jwts.builder().setClaims(claims).setSubject(subject)
+        String val = Jwts.builder().setClaims(claims).setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * jwtDataSource.getExpirationDate()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 3600l))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
+        return val;
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {

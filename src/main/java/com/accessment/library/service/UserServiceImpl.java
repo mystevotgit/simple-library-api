@@ -1,6 +1,6 @@
 package com.accessment.library.service;
 
-import com.accessment.library.dto.UserDTO;
+import com.accessment.library.dto.SignupDTO;
 import com.accessment.library.model.User;
 import com.accessment.library.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -25,20 +25,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         modelMapper.getConfiguration()
                 .setMatchingStrategy(MatchingStrategies.LOOSE);
     }
+
     @Override
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findUserByEmail(s);
-        if (!user.isPresent()) {
-
-        }
-
+        Optional<User> user = userRepository.findUserByEmailId(s);
         return user.get();
     }
 
     @Override
-    public void addUser(UserDTO userDTO) {
+    public void addUser(SignupDTO signupDTO) {
         setModelMappingStrategy();
-        User user = modelMapper.map(userDTO, User.class);
+        User user = modelMapper.map(signupDTO, User.class);
         userRepository.save(user);
         return;
     }

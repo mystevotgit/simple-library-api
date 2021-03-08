@@ -1,10 +1,8 @@
 package com.accessment.library.service;
 
-import com.accessment.library.dto.UserDTO;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
+import com.accessment.library.dto.SignupDTO;
 
 
 public interface UserService {
-    void addUser(UserDTO userDTO);
+    void addUser(SignupDTO signupDTO);
 }

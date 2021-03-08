@@ -15,9 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,31 +38,35 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public ResponseEntity<Set<BookDTO>> getAllLibraryBooks() {
+    public Set<BookDTO> getAllLibraryBooks() {
         setModelMappingStrategy();
         Set<BookDTO> books =  bookRepository.findAll().stream().map(book -> modelMapper.map(book, BookDTO.class))
                 .collect(Collectors.toSet());
-        return ResponseEntity.ok(books);
+        return books;
     }
 
     @Override
-    public ResponseEntity<BookDTO> getBookById(Long bookId) throws ResourceNotFoundException {
+    public List<BookDTO> getBookById(Long bookId) throws ResourceNotFoundException {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new ResourceNotFoundException("Book not found for this id :: " + bookId));
         setModelMappingStrategy();
         BookDTO bookDTO = modelMapper.map(book, BookDTO.class);
-        return ResponseEntity.ok().body(bookDTO);
+        List<BookDTO> returnList = new ArrayList<>();
+        returnList.add(bookDTO);
+        return returnList;
     }
 
     @Override
-    public void createBook(@Valid BookDTO bookDetails) {
+    public BookDTO createBook(@Valid BookDTO bookDetails) {
+        setModelMappingStrategy();
         Book book = new Book();
         book.setAuthor(bookDetails.getAuthor());
         book.setTitle(bookDetails.getTitle());
         book.setCategory(bookDetails.getCategory());
         book.setCopies(bookDetails.getCopies());
-        bookRepository.save(book);
-        return;
+        Book savedBook =  bookRepository.save(book);
+        BookDTO bookDTO = modelMapper.map(savedBook, BookDTO.class);
+        return bookDTO;
     }
 
     @Override
@@ -104,16 +106,16 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long userId) {
+    public ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long bookId, Long userId) {
         setModelMappingStrategy();
-        Book book = modelMapper.map(bookDetails, Book.class);
+        Book book = bookRepository.findById(bookId).get();
         Borrow borrower = new Borrow();
         borrower.setBook(book);
         borrower.setUser(userRepository.findById(userId).get());
         borrower.setCopies(bookDetails.getCopies());
         LendResponseDTO lendResponseDTO = new LendResponseDTO();
-        if(book.getCopies() > 0) {
-            book.setCopies(book.getCopies() - 1);
+        if(book.getCopies() > bookDetails.getCopies()) {
+            book.setCopies(book.getCopies() - bookDetails.getCopies());
             bookRepository.save(book);
             Borrow recordedBorrow = lendRepository.save(borrower);
             lendResponseDTO.setBorrowerId(userId);

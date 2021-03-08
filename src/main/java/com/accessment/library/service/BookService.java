@@ -5,18 +5,20 @@ import com.accessment.library.dto.LendResponseDTO;
 import com.accessment.library.dto.SearchDTO;
 import com.accessment.library.dto.UserDTO;
 import com.accessment.library.exception.ResourceNotFoundException;
+import com.accessment.library.model.Book;
 import org.springframework.http.ResponseEntity;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Set;
 
 public interface BookService {
-    ResponseEntity<Set<BookDTO>> getAllLibraryBooks();
+    Set<BookDTO> getAllLibraryBooks();
 
-    ResponseEntity<BookDTO> getBookById(Long bookId)
+    List<BookDTO> getBookById(Long bookId)
             throws ResourceNotFoundException;
 
-    void createBook(@Valid BookDTO bookDetails);
+    BookDTO createBook(@Valid BookDTO bookDetails);
 
     ResponseEntity<BookDTO> updateBook(Long bookId, BookDTO bookDetails)
             throws ResourceNotFoundException;
@@ -26,7 +28,7 @@ public interface BookService {
 
     ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO searchDetails);
 
-    ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long userId);
+    ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long bookId, Long userId);
 
     ResponseEntity<Set<UserDTO>> getBookBorrowersById(Long bookId) throws ResourceNotFoundException;
 }

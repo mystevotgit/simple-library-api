@@ -1,8 +1,10 @@
 package com.accessment.library.controller;
 
 import com.accessment.library.model.Book;
+import com.accessment.library.model.Borrow;
 import com.accessment.library.model.User;
 import com.accessment.library.repository.BookRepository;
+import com.accessment.library.repository.LendRepository;
 import com.accessment.library.repository.UserRepository;
 import com.accessment.library.utils.JWTUtils;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,6 +25,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.util.*;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -45,9 +48,13 @@ public class LibraryControllerTest {
     private BookRepository bookRepository;
 
     @Autowired
+    private LendRepository lendRepository;
+
+    @Autowired
     private JWTUtils jwtUtils;
 
     final Book book = new Book();
+    final User newUser = new User();
     String token = "";
 
     @BeforeAll
@@ -69,23 +76,42 @@ public class LibraryControllerTest {
         getAndVerifyAllBooks(status().isOk(), token);
     }
 
+    @Test
+    @DisplayName("get all book borrowers successfully")
+    public void getBooksBorrowers() throws Exception {
+        getAndVerifyBorrowedBooks(status().isOk(), book.getId(), token);
+    }
+
     public void getAndVerifyBookById(
-           final ResultMatcher expectedStatus, final Long bookId
-           ,final String token
+            final ResultMatcher expectedStatus, final Long bookId
+            , final String token
     ) throws Exception {
         mockMvc.perform(get("/api/v1/book/" + bookId)
                 .content(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer "+ token))
+                .header("Authorization", "Bearer " + token))
                 .andExpect(expectedStatus);
     }
 
     public void getAndVerifyAllBooks(
-            final ResultMatcher expectedStatus,final String token
+            final ResultMatcher expectedStatus, final String token
     ) throws Exception {
+
         mockMvc.perform(get("/api/v1/book")
                 .content(MediaType.APPLICATION_JSON_VALUE)
-                .header("Authorization", "Bearer "+ token))
+                .header("Authorization", "Bearer " + token))
+                .andExpect(expectedStatus);
+    }
+
+    public void getAndVerifyBorrowedBooks(
+            final ResultMatcher expectedStatus,
+            final Long bookId, final String token
+            ) throws Exception {
+
+        mockMvc.perform(get("/api/v1/book/" + bookId + "/borrowers")
+                .content(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + token))
                 .andExpect(expectedStatus).andDo(print());
+
     }
 
     private UserDetails createUser() {
@@ -99,7 +125,6 @@ public class LibraryControllerTest {
 
     private void seedData() {
 
-        User newUser = new User();
         newUser.setFirstName("firstName");
         newUser.setLastName("lastName");
         newUser.setPassword(passwordEncoder.encode("password"));
@@ -114,5 +139,11 @@ public class LibraryControllerTest {
         book.setBorrowers(Collections.emptySet());
         bookRepository.save(book);
 
+        Borrow borrow = new Borrow();
+        borrow.setBook(book);
+        borrow.setUser(newUser);
+        borrow.setCopies(1);
+
+        lendRepository.save(borrow);
     }
 }

@@ -1,6 +1,7 @@
 package com.accessment.library.controller;
 
 import com.accessment.library.dto.BookDTO;
+import com.accessment.library.dto.BookRequestDTO;
 import com.accessment.library.dto.SearchDTO;
 import com.accessment.library.model.Book;
 import com.accessment.library.model.Borrow;
@@ -122,8 +123,9 @@ public class LibraryControllerTest {
     @Test
     @DisplayName("lend books sucessfully")
     public void lendBooks() throws Exception {
-        final Integer copies = 1;
-        lendAndVerifyBook(status().isOk(), token, copies,
+        final BookRequestDTO bookRequestDTO = new BookRequestDTO();
+        bookRequestDTO.setCopies(1);
+        lendAndVerifyBook(status().isOk(), token, bookRequestDTO,
                 book.getId(), newUser.getId());
     }
 
@@ -212,12 +214,12 @@ public class LibraryControllerTest {
 
     public void lendAndVerifyBook(
             final ResultMatcher expectedStatus, final String token,
-            final Integer copies, final Long bookId, final Long userId
+            final BookRequestDTO bookRequestDTO, final Long bookId, final Long userId
     ) throws Exception {
 
         mockMvc.perform(post("/api/v1/book/lendbook/"+bookId+"/"+userId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(asJsonString(copies))
+                .content(asJsonString(bookRequestDTO))
                 .header("Authorization", "Bearer " + token))
                 .andExpect(expectedStatus);
 

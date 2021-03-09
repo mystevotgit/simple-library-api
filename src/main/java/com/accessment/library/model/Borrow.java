@@ -21,7 +21,6 @@ public class Borrow {
     private User user;
 
     @ManyToOne
-    @JsonIgnore
     private Book book;
 
     @Column(name = "copies", nullable = false)

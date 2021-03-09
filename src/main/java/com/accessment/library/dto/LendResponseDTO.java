@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -14,5 +13,5 @@ import java.util.Set;
 public class LendResponseDTO {
     private long borrowerId;
     private String borrowerName;
-    private Set<BorrowDTO> booksBorrowed;
+    private BorrowedBookDTO bookBorrowed;
 }

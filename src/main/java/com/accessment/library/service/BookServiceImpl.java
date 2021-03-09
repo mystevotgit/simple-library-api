@@ -105,23 +105,25 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public ResponseEntity<LendResponseDTO> lendBook(@Valid Integer copies, Long bookId, Long userId) {
+    public ResponseEntity<LendResponseDTO> lendBook(@Valid BookRequestDTO bookRequestDTO, Long bookId, Long userId) {
         setModelMappingStrategy();
         Book book = bookRepository.findById(bookId).get();
         Borrow borrower = new Borrow();
         borrower.setBook(book);
         borrower.setUser(userRepository.findById(userId).get());
-        borrower.setCopies(copies);
+        borrower.setCopies(bookRequestDTO.getCopies());
         LendResponseDTO lendResponseDTO = new LendResponseDTO();
-        if(book.getCopies() > copies) {
-            book.setCopies(book.getCopies() - copies);
+        if(book.getCopies() > bookRequestDTO.getCopies()) {
+            book.setCopies(book.getCopies() - bookRequestDTO.getCopies());
             bookRepository.save(book);
             Borrow recordedBorrow = lendRepository.save(borrower);
             lendResponseDTO.setBorrowerId(userId);
             lendResponseDTO.setBorrowerName(recordedBorrow.getUser().getFirstName() + " " + recordedBorrow.getUser().getLastName());
-            Set<BorrowDTO> booksBorrowed = recordedBorrow.getUser().getBooksBorrowed().stream().map(borrow -> modelMapper
-                    .map(borrow, BorrowDTO.class)).collect(Collectors.toSet());
-            lendResponseDTO.setBooksBorrowed(booksBorrowed);
+            BorrowedBookDTO bookBorrowed = new BorrowedBookDTO();
+            bookBorrowed.setTitle(book.getTitle());
+            bookBorrowed.setAuthor(book.getAuthor());
+            bookBorrowed.setCopies(bookRequestDTO.getCopies());
+            lendResponseDTO.setBookBorrowed(bookBorrowed);
         }
         return ResponseEntity.ok(lendResponseDTO);
     }

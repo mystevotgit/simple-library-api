@@ -1,6 +1,7 @@
 package com.accessment.library.controller;
 
 import com.accessment.library.dto.BookDTO;
+import com.accessment.library.dto.SearchDTO;
 import com.accessment.library.model.Book;
 import com.accessment.library.model.Borrow;
 import com.accessment.library.model.User;
@@ -109,6 +110,43 @@ public class LibraryControllerTest {
         updateAndVerifyBook(status().isOk(), bookDTO, token);
     }
 
+    @Test
+    @DisplayName("search for books successfully")
+    public void searchForBooks() throws Exception {
+        final SearchDTO searchDTO = new SearchDTO();
+        searchDTO.setKeywords("title");
+
+        searchAndVerifyBooks(status().isOk(), searchDTO, token);
+    }
+
+    @Test
+    @DisplayName("lend books sucessfully")
+    public void lendBooks() throws Exception {
+        final BookDTO bookDTO = new BookDTO();
+        bookDTO.setTitle("title");
+        bookDTO.setCopies(1);
+        bookDTO.setCategory("category");
+        bookDTO.setAuthor("author");
+
+        lendAndVerifyBook(status().isOk(), token, bookDTO,
+                book.getId(), newUser.getId());
+    }
+
+    @Test
+    @DisplayName("delete book successfully")
+    public void deleteBook() throws Exception {
+        final Book book2 = new Book();
+
+        book2.setCopies(2);
+        book2.setCategory("category");
+        book2.setAuthor("author");
+        book2.setTitle("title2");
+        book2.setBorrowers(Collections.emptySet());
+        bookRepository.save(book2);
+
+        deleteAndVerifyBook(status().isNoContent(), token, book2.getId());
+    }
+
     public void getAndVerifyBookById(
             final ResultMatcher expectedStatus, final Long bookId
             , final String token
@@ -165,6 +203,43 @@ public class LibraryControllerTest {
                 .andExpect(expectedStatus);
     }
 
+    public void searchAndVerifyBooks(
+            final ResultMatcher expectedStatus,
+            final SearchDTO searchDTO, final String token
+    ) throws Exception {
+
+        mockMvc.perform(post("/api/v1/book/search")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(asJsonString(searchDTO))
+                .header("Authorization", "Bearer " + token))
+                .andExpect(expectedStatus).andDo(print());
+    }
+
+    public void lendAndVerifyBook(
+            final ResultMatcher expectedStatus, final String token,
+            final BookDTO bookDTO, final Long bookId, final Long userId
+    ) throws Exception {
+
+        mockMvc.perform(post("/api/v1/book/lendbook/"+bookId+"/"+userId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(asJsonString(bookDTO))
+                .header("Authorization", "Bearer " + token))
+                .andExpect(expectedStatus);
+
+    }
+
+    public void deleteAndVerifyBook(
+            final ResultMatcher expectedStatus, final String token,
+             final Long bookId
+    ) throws Exception {
+
+        mockMvc.perform(delete("/api/v1/book/"+bookId)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .header("Authorization", "Bearer " + token))
+                .andExpect(expectedStatus);
+
+    }
+
     private UserDetails createUser() {
         User user = new User();
         user.setEmailId("test@app.com");
@@ -189,6 +264,7 @@ public class LibraryControllerTest {
         book.setTitle("title");
         book.setBorrowers(Collections.emptySet());
         bookRepository.save(book);
+        //ANOTHER BOOK
 
         Borrow borrow = new Borrow();
         borrow.setBook(book);

@@ -28,7 +28,7 @@ public interface BookService {
 
     ResponseEntity<Set<BookDTO>> bookSearch(@Valid SearchDTO searchDetails);
 
-    ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long bookId, Long userId);
+    ResponseEntity<LendResponseDTO> lendBook(@Valid Integer copies, Long bookId, Long userId);
 
     ResponseEntity<Set<UserDTO>> getBookBorrowersById(Long bookId) throws ResourceNotFoundException;
 }

@@ -122,13 +122,8 @@ public class LibraryControllerTest {
     @Test
     @DisplayName("lend books sucessfully")
     public void lendBooks() throws Exception {
-        final BookDTO bookDTO = new BookDTO();
-        bookDTO.setTitle("title");
-        bookDTO.setCopies(1);
-        bookDTO.setCategory("category");
-        bookDTO.setAuthor("author");
-
-        lendAndVerifyBook(status().isOk(), token, bookDTO,
+        final Integer copies = 1;
+        lendAndVerifyBook(status().isOk(), token, copies,
                 book.getId(), newUser.getId());
     }
 
@@ -217,12 +212,12 @@ public class LibraryControllerTest {
 
     public void lendAndVerifyBook(
             final ResultMatcher expectedStatus, final String token,
-            final BookDTO bookDTO, final Long bookId, final Long userId
+            final Integer copies, final Long bookId, final Long userId
     ) throws Exception {
 
         mockMvc.perform(post("/api/v1/book/lendbook/"+bookId+"/"+userId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(asJsonString(bookDTO))
+                .content(asJsonString(copies))
                 .header("Authorization", "Bearer " + token))
                 .andExpect(expectedStatus);
 

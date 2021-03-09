@@ -65,7 +65,7 @@ public class LibraryController {
     }
 
     @PostMapping("/book/lendbook/{bookId}/{userId}")
-    public ResponseEntity<LendResponseDTO> lendBook(@PathVariable(value = "bookId") Long bookId, @PathVariable(value = "userId") Long userId, @Valid @RequestBody BookDTO bookDetails) {
-        return bookService.lendBook(bookDetails, bookId, userId);
+    public ResponseEntity<LendResponseDTO> lendBook(@PathVariable(value = "bookId") Long bookId, @PathVariable(value = "userId") Long userId, @Valid @RequestBody Integer copies) {
+        return bookService.lendBook(copies, bookId, userId);
     }
 }

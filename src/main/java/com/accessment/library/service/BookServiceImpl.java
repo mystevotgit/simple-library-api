@@ -10,7 +10,6 @@ import com.accessment.library.repository.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -106,16 +105,16 @@ public class BookServiceImpl implements BookService{
     }
 
     @Override
-    public ResponseEntity<LendResponseDTO> lendBook(@Valid BookDTO bookDetails, Long bookId, Long userId) {
+    public ResponseEntity<LendResponseDTO> lendBook(@Valid Integer copies, Long bookId, Long userId) {
         setModelMappingStrategy();
         Book book = bookRepository.findById(bookId).get();
         Borrow borrower = new Borrow();
         borrower.setBook(book);
         borrower.setUser(userRepository.findById(userId).get());
-        borrower.setCopies(bookDetails.getCopies());
+        borrower.setCopies(copies);
         LendResponseDTO lendResponseDTO = new LendResponseDTO();
-        if(book.getCopies() > bookDetails.getCopies()) {
-            book.setCopies(book.getCopies() - bookDetails.getCopies());
+        if(book.getCopies() > copies) {
+            book.setCopies(book.getCopies() - copies);
             bookRepository.save(book);
             Borrow recordedBorrow = lendRepository.save(borrower);
             lendResponseDTO.setBorrowerId(userId);

@@ -38,8 +38,12 @@ public class LibraryController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<BookDTO> createBook(@Valid @RequestBody BookDTO bookDetails) {
-        return ResponseEntity.ok(bookService.createBook(bookDetails));
+    public ResponseEntity<String> createBook(@Valid @RequestBody BookDTO bookDetails) {
+        BookDTO bookDTO = bookService.createBook(bookDetails);
+        if (bookDTO.getTitle() == null) {
+            return ResponseEntity.ok(bookDetails.getTitle() + " has previously been added to the library.");
+        }
+        return ResponseEntity.ok(bookDetails.getTitle() + " was added to the library successfully");
     }
 
     @PutMapping("/book/{id}")

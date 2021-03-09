@@ -59,13 +59,16 @@ public class BookServiceImpl implements BookService{
     public BookDTO createBook(@Valid BookDTO bookDetails) {
         setModelMappingStrategy();
         Book book = new Book();
-        book.setAuthor(bookDetails.getAuthor());
-        book.setTitle(bookDetails.getTitle());
-        book.setCategory(bookDetails.getCategory());
-        book.setCopies(bookDetails.getCopies());
-        Book savedBook =  bookRepository.save(book);
-        BookDTO bookDTO = modelMapper.map(savedBook, BookDTO.class);
-        return bookDTO;
+        if(bookRepository.findAll().stream().filter(currentBook -> currentBook.getTitle().equals(bookDetails.getTitle())).count() < 1) {
+            book.setAuthor(bookDetails.getAuthor());
+            book.setTitle(bookDetails.getTitle());
+            book.setCategory(bookDetails.getCategory());
+            book.setCopies(bookDetails.getCopies());
+            Book savedBook =  bookRepository.save(book);
+            BookDTO bookDTO = modelMapper.map(savedBook, BookDTO.class);
+            return bookDTO;
+        }
+        return new BookDTO();
     }
 
     @Override
